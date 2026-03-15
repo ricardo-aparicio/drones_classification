@@ -2,10 +2,10 @@
 from pathlib import Path
 import shutil
 
-BASE = Path(".")  # carpeta actual: DETECTIONV1/dataset
-OUT = BASE / "spectrograms_rc_24_58_fly21"  #spectrograms_rc_24_fly4 con FPV UNOPES
+BASE = Path(".")  # DETECTIONV1/dataset
+OUT = BASE / "spectrograms_rc_24_58_fly21" 
 
-AUTEL_FOLDERS = [ #necesito 17991 por frecuencia
+AUTEL_FOLDERS = [ 
     "autel_envuelo_auto_01", #2999 images dron flying in anechoic chamber with RC
     "autel_envuelo_auto_02", #2999 images in dron flying in anechoic chamber with RC
     "autel_con_rc02_30db", #1499 images with RC
