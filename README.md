@@ -15,17 +15,27 @@ For this preliminary delivery, the data acquisition, preprocessing, and initial 
 
 ## File Structure
 ```text
+├── sample_dataset/                     # Toy dataset (~100 images) to test the pipeline without downloading 2GB
+│   ├── test/                           # Sample test images per class
+│   ├── train/                          # Sample training images per class
+│   └── val/                            # Sample validation images per class
 ├── data_collection/
-│   ├── v2data_acquisition.py       # Captures raw I/Q data from PlutoSDR
-│   └── iq_to_spectrogram.py        # Converts I/Q data to spectrograms (Min-Max norm)
+│   ├── v2data_acquisition.py           # Captures raw I/Q data from PlutoSDR
+│   └── iq_to_spectrogram.py            # Converts I/Q data to spectrograms (Min-Max norm)
 ├── dataset_preparation/
-│   ├── build_spectrograms.py       # Aggregates images from multiple sessions
-│   └── make_manual_split_session.py# Splits data into Train, Val, and Test sets
+│   ├── build_spectrograms.py           # Aggregates images from multiple sessions
+│   └── make_manual_split_session.py    # Splits data into Train, Val, and Test sets
 ├── model_training/
-│   ├── args.yaml                   # YOLOv11 training hyperparameters
-│   └── train_yolo11_cls.py         # Script to train the YOLOv11 classification model
-└── inference/
-    └── realtime_yolo11_sdr.py      # Real-time SDR capture and YOLOv11 inference script
+│   ├── args.yaml                       # YOLOv11 training hyperparameters
+│   ├── train_yolo11_cls.py             # Script to train the YOLOv11 classification model
+│   ├── best.pt                         # Final trained YOLOv11 weights (fly21 session)
+│   ├── confusion_matrix.png            # Absolute confusion matrix of the test set
+│   ├── confusion_matrix_normalized.png # Normalized confusion matrix demonstrating 1.00 diagonal accuracy
+│   ├── results.csv                     # Raw training metrics and losses per epoch
+│   └── results.png                     # Graphical training/validation loss and accuracy curves
+├── inference/
+│   └── realtime_yolo11_sdr.py          # Real-time SDR capture and YOLOv11 inference script
+
 
 
 
