@@ -10,17 +10,17 @@ from skimage.transform import resize
 from ultralytics import YOLO
 
 
-# Parámetros de RF 
+# RF parameters
 SDR_IP          = "ip:192.168.201.204"
 CENTER_FREQ_HZ  = 5.787e9       # 2.442 GHz #5.645 #5.787  #5746 a 5786 anchos de los DJI - HSB 5.786
 FS              = 50e6          # 50 MS/s
 RF_BW_HZ        = 45e6
 GAIN_DB         = 30
 
-# Tamaño de ventana para el espectrograma
+# window size
 WINDOW_SAMPLES  = 200_000
 
-# Modelo YOLO entrenado
+# Trained YOLO model
 ROOT = Path(__file__).parent
 MODEL_PATH = ROOT / "runs_yolo11_cls" / "drone_spectrograms_rc_24_58_fly21_session" / "weights" / "best.pt"  
 # drone_spectrograms_rc_24_fly12_session # drone_spectrograms_rc_24_58_fly16_session
@@ -47,42 +47,9 @@ def iq_to_spec_image(iq_seg: np.ndarray) -> np.ndarray:
      img_rgb = (img_rgba[:, :, :3] * 255).astype(np.uint8)
      return img_rgb
 
-# def iq_to_spec_image(iq_seg: np.ndarray) -> np.ndarray:
-#     f, t, Sxx = spectrogram(
-#         iq_seg,
-#         fs=FS,
-#         window="hann",
-#         nperseg=1024,
-#         noverlap=512,
-#         scaling="density",
-#         mode="magnitude",
-#         return_onesided=False,
-#     )
-
-#     # dB
-#     Sxx_db = 20 * np.log10(Sxx + 1e-12)
-
-#     # Normalización robusta por percentiles
-#     p_low, p_high = 5, 99.5
-#     lo = np.percentile(Sxx_db, p_low)
-#     hi = np.percentile(Sxx_db, p_high)
-
-#     # Clip para que spikes no dominen el rango
-#     Sxx_db = np.clip(Sxx_db, lo, hi)
-
-#     # Normalizar a [0,1]
-#     Sxx_norm = (Sxx_db - lo) / (hi - lo + 1e-9)
-
-#     spec_256 = resize(Sxx_norm, (256, 256), mode="reflect", anti_aliasing=True).astype(np.float32)
-
-#     cmap = plt.get_cmap("viridis")
-#     img_rgba = cmap(spec_256)
-#     img_rgb = (img_rgba[:, :, :3] * 255).astype(np.uint8)
-#     return img_rgb
-
 def main():
 
-    # Configurar SDR
+    # Configure SDR
     print("[*] Conectando al SDR...")
     sdr = adi.Pluto(SDR_IP)
 
@@ -92,7 +59,7 @@ def main():
     sdr.gain_control_mode_chan0 = "manual"
     sdr.rx_hardwaregain_chan0 = GAIN_DB
 
-    # Buffer de recepción ~ tamaño de ventana
+    # Receive buffer ~ window size
     sdr.rx_buffer_size = WINDOW_SAMPLES
 
     print("[*] SDR configurado:")
@@ -102,7 +69,7 @@ def main():
     print("    G   =", sdr.rx_hardwaregain_chan0)
 
   
-    # Cargar modelo YOLO
+    # Load YOLO model
     print("[*] Cargando modelo YOLO:", MODEL_PATH)
     model = YOLO(str(MODEL_PATH))
     class_names = model.names
@@ -114,7 +81,7 @@ def main():
 
     try:
         while True:
-            # 1) Capturar un bloque de IQ
+            # 1) Capture an IQ block
             iq = sdr.rx()  # numpy array complejo
 
             if len(iq) < WINDOW_SAMPLES:
@@ -122,10 +89,10 @@ def main():
 
             iq_seg = np.asarray(iq[:WINDOW_SAMPLES], dtype=np.complex64)
 
-            # 2) IQ -> espectrograma -> imagen 256x256
+            # 2) IQ -> spectrogram -> 256x256 image
             img_rgb = iq_to_spec_image(iq_seg)
 
-            # 3) Predicción con YOLOv11n-Cls
+            # 3) Prediction with YOLOv11n-Cls
             results = model.predict(
                 source=img_rgb,
                 imgsz=256,
@@ -139,7 +106,6 @@ def main():
 
             probs_vec = probs.data.cpu().numpy()
 
-            # 4) Mostrar resultado en consola
             print(f"[PRED] Clase={label:10s}  conf={conf:.3f}  "
                   f"probs={probs_vec}", flush=True)
 
