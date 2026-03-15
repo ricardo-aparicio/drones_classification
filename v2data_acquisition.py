@@ -10,14 +10,14 @@ DATA_DIR = ROOT
 sdr = adi.Pluto("ip:192.168.201.204")
 
 #5.787 GHz
-sdr.rx_lo = int(5.787e9)     #5.787 5.658 5.650_2 5.645_3,5 (con RC) (la buena) 5.640_4 850_6 900_7 (dron.rc) _8 (sin dron)
-sdr.sample_rate = int(50e6)    #900_9 (dron) #900_10 (dron y RC) #900_11 (RC) 5.645_12,13 (con RC, helices camara)
-sdr.rx_rf_bandwidth = int(45e6)  #900_14 (con RC, helices camara) 5.645_15 (con RC, volando camara) 900_16 (con RC, volando camara)
-sdr.gain_control_mode_chan0 = "manual"  #5.787 AUTEL 5.725 - 5.85 ; DJIM30T 5.787 (5.786 HSB); MAVIC4PRO (5.786 HSB)
+sdr.rx_lo = int(5.787e9)     
+sdr.sample_rate = int(50e6)    
+sdr.rx_rf_bandwidth = int(45e6)  
+sdr.gain_control_mode_chan0 = "manual"  
 sdr.rx_hardwaregain_chan0 = 30  
 
 
-OUT_FILE = DATA_DIR / "background_negatives_01.bin"    # mavic4pro_envuelo_10m_5G_rigth.bin mavic4pro_envuelo_10m_5G_center.bin 
+OUT_FILE = DATA_DIR / "background_negatives_01.bin"   
 
 DURATION_SEC   = 3       
 CHUNK_SAMPLES  = 1_000_000   
