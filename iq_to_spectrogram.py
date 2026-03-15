@@ -41,7 +41,7 @@ for start in range(0, len(iq) - WINDOW_SAMPLES + 1, STEP_SAMPLES):
     Sxx_db = 20 * np.log10(Sxx + 1e-12)
     Sxx_norm = (Sxx_db - Sxx_db.min()) / (Sxx_db.max() - Sxx_db.min() + 1e-9)
 
-    # 4) Redimensionar a 256x256
+    # Resize to 256x256
     spec_256 = resize(
         Sxx_norm,
         (256, 256),
@@ -49,7 +49,7 @@ for start in range(0, len(iq) - WINDOW_SAMPLES + 1, STEP_SAMPLES):
         anti_aliasing=True
     )
 
-    # 5) Guardar imagen
+    # Save image
     out_path = OUTPUT_DIR / f"bg_{idx:04d}.png"
     plt.imsave(out_path, spec_256, cmap="viridis")
     idx += 1
