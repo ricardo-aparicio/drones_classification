@@ -8,9 +8,9 @@ OUTPUT_DIR = ROOT / "dataset_split_rc24_58_fly21_session"
 
 MANUAL_SPLITS = {
     "autel": {
-        # sesión de 2.4G y de 5.8G para Validación
+        # 2.4G and 5.8G session for Validation
         "val":  ["autel_con_rc02_30db", "autel_envuelo_auto_5G_03","autel_envuelo_auto_06","autel_envuelo_auto_07","autel_envuelo_auto_5G_09","autel_envuelo_auto_5G_10"],
-        # sesión de 2.4G y de 5.8G para Test
+        # 2.4G and 5.8G session for Test
         "test": ["autel_envuelo_auto_01", "autel_envuelo_auto_5G_01","autel_envuelo_auto_08","autel_envuelo_auto_09","autel_envuelo_auto_5G_11","autel_envuelo_auto_5G_12"]
     },                                     
     "m30t": {
@@ -155,7 +155,6 @@ def main():
         print(f"[!] Error: No se encontró el directorio base {INPUT_DIR}")
         return
 
-    # Contadores
     stats = {"train": 0, "val": 0, "test": 0}
 
     # 2. Process each class (autel, m30t, mavic4pro, fpv, background)
@@ -166,11 +165,11 @@ def main():
         class_name = class_dir.name
         print(f"\n[*] Procesando clase: {class_name}")
 
-        # Crear subcarpetas para la clase dentro de train, val y test
+        # Create subfolders for the class within train, val, and test
         for split in ["train", "val", "test"]:
             (OUTPUT_DIR / split / class_name).mkdir(parents=True, exist_ok=True)
 
-        # Cargar las listas de sesiones asignadas a val y test para esta clase
+        # Load the lists of sessions assigned to val and test for this class
         val_sessions = MANUAL_SPLITS.get(class_name, {}).get("val", [])
         test_sessions = MANUAL_SPLITS.get(class_name, {}).get("test", [])
 
@@ -183,33 +182,30 @@ def main():
             # va a 'train'
             split_dest = "train" 
             
-            # Verificamos si el nombre del archivo empieza con alguna sesión de Validación
             for val_ses in val_sessions:
                 if filename.startswith(val_ses):
                     split_dest = "val"
                     break
                     
-            # Si no se fue a Validación, verificamos si va a Test
             if split_dest == "train": 
                 for test_ses in test_sessions:
                     if filename.startswith(test_ses):
                         split_dest = "test"
                         break
             
-            # 3. Copiar la imagen a su destino final
+            # 3. Copy the image to its final destination
             dst_path = OUTPUT_DIR / split_dest / class_name / filename
             shutil.copy2(img_path, dst_path)
             
-            # Actualizar contadores
             contadores_clase[split_dest] += 1
             stats[split_dest] += 1
             
-        # Imprimir resumen de la clase
+
         print(f"  -> Train: {contadores_clase['train']} imágenes")
         print(f"  -> Val:   {contadores_clase['val']} imágenes")
         print(f"  -> Test:  {contadores_clase['test']} imágenes")
 
-    # 5. Reporte final
+
     print("\n" + "="*50)
     print(" PARTICIÓN COMPLETADA CON ÉXITO")
     print("="*50)
