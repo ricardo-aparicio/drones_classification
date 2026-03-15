@@ -6,10 +6,6 @@ from ultralytics import YOLO
 ROOT = Path(__file__).parent
 DATA_DIR = ROOT / "dataset_split_rc24_58_fly21_session"  
 
- # dataset_split_rc24_fly3 (ruido_camara01_30db, ruido_ambiente) probado sin tantos falsos positivos
- # dataset_split_rc24_fly4 con FPV UNOPES
- # dataset_split_rc24_fly10_session (más estable)
- # dataset_split_rc24_fly13_session (con más imágenes de fondo, incluyendo ambiente_afuera sin drones)
 MODEL_WEIGHTS = "yolo11n-cls.pt"
 
 
