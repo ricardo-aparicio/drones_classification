@@ -10,6 +10,9 @@ This project transforms raw I/Q RF signals captured via an ADALM-Pluto SDR into 
 ## Advance Presented in this Activity (Preliminary Results)
 For this preliminary delivery, the data acquisition, preprocessing, and initial model training pipelines have been completed. A highly curated dataset of over 150,000 spectrogram images was generated, balanced across 5 classes (Autel, FPV, M30T, Mavic 4 Pro, and Background). The current advance includes the successful training of the YOLOv11-cls model, which incorporates "Hard Negative Mining" to proactively filter out massive 5.8 GHz Wi-Fi interference. The preliminary model achieves over 99% Top-1 accuracy on the test set and is capable of real-time inference using a sliding window persistence algorithm to avoid false positives.
 
+## Note: 
+"A sample dataset with 100 images is included to run and test the training scripts (train_yolo11_cls.py). The complete original dataset of 150,000 images exceeds GitHub's limits and is stored locally."
+
 ## File Structure
 ```text
 ├── data_collection/
@@ -24,4 +27,5 @@ For this preliminary delivery, the data acquisition, preprocessing, and initial 
 └── inference/
     └── realtime_yolo11_sdr.py      # Real-time SDR capture and YOLOv11 inference script
 
-## Note: "A sample dataset with 100 images is included to run and test the training scripts (train_yolo11_cls.py). The complete original dataset of 150,000 images exceeds GitHub's limits and is stored locally."
+
+
