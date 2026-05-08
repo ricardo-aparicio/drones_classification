@@ -19,7 +19,7 @@ GAIN_DB = 30
 WINDOW_SAMPLES = 200_000
 
 # =========================
-# Bandas y secuencia de escaneo
+# Bands and scanning sequence
 # =========================
 CENTERS_24 = [2.427e9, 2.455e9]
 CENTERS_58 = [5.646e9,5.756e9, 5.787e9, 5.818e9]
@@ -37,8 +37,8 @@ SCAN_SEQUENCE = (
 # =========================
 # Timing / retune
 # =========================
-RETUNE_SLEEP = 0.03   # antes 0.05
-LOOP_SLEEP = 0.00     # antes 0.02
+RETUNE_SLEEP = 0.03   # previously 0.05
+LOOP_SLEEP = 0.00     # previously 0.02
 
 def retune_and_flush(sdr, lo_hz: float):
     sdr.rx_lo = int(lo_hz)
@@ -56,33 +56,33 @@ CONFIRM_FRAMES = 15
 NEIGHBOR_FRAMES = 6
 
 # =========================
-# Suavizado temporal por frecuencia
+# Temporal smoothing per frequency
 # =========================
-EMA_ALPHA_NEW = 0.65  # peso de la evidencia nueva
+EMA_ALPHA_NEW = 0.65  # weight of the new evidence
 
 # =========================
-# Umbrales (perfil long-range)
+# Thresholds (long-range profile)
 # =========================
-# Etapa "near suspect" -> dispara FOCUS
+# "Near suspect" stage -> triggers FOCUS
 NEAR_NONBG_CONF_THR = 0.28
 NEAR_BEST_NONBG_THR = 0.22
 NEAR_BG_GAP_THR = 0.25
 NEAR_MARGIN_THR = 0.25
 
-# Etapa sospechosa -> dispara HOLD
+# Suspect stage -> triggers HOLD
 SUSPECT_NONBG_CONF_THR = 0.40
 SUSPECT_BEST_NONBG_THR = 0.30
 SUSPECT_BG_GAP_THR = 0.18
 SUSPECT_MARGIN_THR = 0.18
 
-# Confirmación final
+# Final confirmation
 CONFIRM_NONBG_CONF_THR = 0.50
 CONFIRM_MARGIN_THR = 0.08
 
 BACKGROUND_LABEL = "background"
 
 # =========================
-# Modelo
+# Model
 # =========================
 ROOT = Path(__file__).parent
 MODEL_PATH = ROOT / "runs_yolo11_cls" / "drone_spectrograms_rc24_58_fly24_session_c_unopes" / "weights" / "best.pt"
@@ -172,7 +172,7 @@ def summarize_probs(probs_mean: np.ndarray, class_names: dict) -> dict:
     best_nonbg_label = class_names[best_nonbg]
 
     margin = conf1 - conf2
-    bg_gap = bg_conf - best_nonbg_conf  # si es pequeño, el no-background va cerca del background
+    bg_gap = bg_conf - best_nonbg_conf  # if it is small, the non-background class is close to background
 
     return {
         "top1": top1,
@@ -200,15 +200,15 @@ def update_ema(history: dict, key: float, probs: np.ndarray) -> np.ndarray:
 
 
 def is_near_suspect(s: dict) -> bool:
-    # top1 no background aunque sea débil
+    # top1 is not background, even if it is weak
     if s["label1"] != BACKGROUND_LABEL and s["conf1"] >= NEAR_NONBG_CONF_THR:
         return True
 
-    # background gana, pero el mejor no-background está cerca
+    # background wins, but the best non-background class is close
     if s["best_nonbg_conf"] >= NEAR_BEST_NONBG_THR and s["bg_gap"] <= NEAR_BG_GAP_THR:
         return True
 
-    # caso ambiguo general
+    # general ambiguous case
     if s["conf1"] >= 0.35 and s["margin"] <= NEAR_MARGIN_THR:
         return True
 
@@ -216,15 +216,15 @@ def is_near_suspect(s: dict) -> bool:
 
 
 def is_suspect(s: dict) -> bool:
-    # top1 no background con confianza moderada
+    # top1 is not background with moderate confidence
     if s["label1"] != BACKGROUND_LABEL and s["conf1"] >= SUSPECT_NONBG_CONF_THR:
         return True
 
-    # background gana, pero el mejor no-background va muy cerca
+    # background wins, but the best non-background class is very close
     if s["best_nonbg_conf"] >= SUSPECT_BEST_NONBG_THR and s["bg_gap"] <= SUSPECT_BG_GAP_THR:
         return True
 
-    # margen ambiguo
+    # ambiguous margin
     if s["conf1"] >= 0.35 and s["margin"] <= SUSPECT_MARGIN_THR:
         return True
 
@@ -301,13 +301,13 @@ def main():
     )
     print("      Ctrl+C para detener.\n")
 
-    # memoria EMA por LO
+    # EMA memory per LO
     history_ema: dict[float, np.ndarray] = {}
 
     try:
         while True:
             for band, idx, lo_hz in SCAN_SEQUENCE:
-                # 1) retune + SCAN corto
+                # 1) retune + short SCAN
                 retune_and_flush(sdr, lo_hz)
                 probs_fast, n_ok_fast = collect_probs_mean_tuned(sdr, model, FAST_FRAMES)
                 if probs_fast is None:
@@ -328,7 +328,7 @@ def main():
                     flush=True
                 )
 
-                # 2) si está cerca de sospecha -> FOCUS en el mismo LO
+                # 2) if it is near suspect -> FOCUS on the same LO
                 focus_summary = s_fast
                 if is_near_suspect(s_fast) or is_near_suspect(s_ema):
                     focus_items = [(probs_fast, n_ok_fast)]
@@ -355,7 +355,7 @@ def main():
                             flush=True
                         )
 
-                        # 3) HOLD / CONFIRM si después de FOCUS ya se ve sospechoso
+                        # 3) HOLD / CONFIRM if after FOCUS it is already suspicious
                         if is_suspect(focus_summary) or is_suspect(s_ema_focus):
                             probs_c, n_ok_c = collect_probs_mean_tuned(sdr, model, CONFIRM_FRAMES)
                             if probs_c is None:
@@ -374,7 +374,7 @@ def main():
                                 flush=True
                             )
 
-                            # 4) evento confirmado + vecinos
+                            # 4) confirmed event + neighbors
                             if is_confirmed(s_conf):
                                 print(
                                     f"[EVENT] CONFIRMED BAND={band} FREC={lo_hz/1e9:.3f} "
