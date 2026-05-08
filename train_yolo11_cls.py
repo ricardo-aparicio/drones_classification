@@ -4,7 +4,7 @@ from ultralytics import YOLO
 
 # Paths
 ROOT = Path(__file__).parent
-DATA_DIR = ROOT / "dataset_split_rc24_58_fly21_session"  
+DATA_DIR = ROOT / "dataset_split_rc24_58_fly24_session_c_unopes"  
 
 MODEL_WEIGHTS = "yolo11n-cls.pt"
 
@@ -24,7 +24,7 @@ def main():
         patience=10,             
         device=0,                
         project="runs_yolo11_cls",
-        name="drone_spectrograms_rc_24_58_fly21_session",    # drone_spectrograms_rc_24_fly21_session (more stable training)
+        name="drone_spectrograms_rc24_58_fly24_session_c_unopes", 
         verbose=True,
         pretrained=True,
 
@@ -48,7 +48,7 @@ def main():
     print("Test top-5 acc:", metrics_test.top5)
 
 
-    sample_img_dir = ROOT / "dataset_split_rc24_58_fly21_session" / "test" / "background"
+    sample_img_dir = ROOT / "drone_spectrograms_rc24_58_fly24_session_c_unopes" / "test" / "mavic3pro"
     sample_img = next(sample_img_dir.glob("*.png"))
 
     preds = model.predict(source=str(sample_img), imgsz=256)
