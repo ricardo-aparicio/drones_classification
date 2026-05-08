@@ -11,8 +11,8 @@ from ultralytics import YOLO
 
 
 # RF parameters
-SDR_IP          = "ip:192.168.201.204"
-CENTER_FREQ_HZ  = 5.787e9       # 2.442 GHz #5.645 #5.787  #5746 a 5786 anchos de los DJI - HSB 5.786
+SDR_IP          = "ip:192.168.202.204"
+CENTER_FREQ_HZ  = 5.787e9       
 FS              = 50e6          # 50 MS/s
 RF_BW_HZ        = 45e6
 GAIN_DB         = 30
@@ -22,8 +22,7 @@ WINDOW_SAMPLES  = 200_000
 
 # Trained YOLO model
 ROOT = Path(__file__).parent
-MODEL_PATH = ROOT / "runs_yolo11_cls" / "drone_spectrograms_rc_24_58_fly21_session" / "weights" / "best.pt"  
-# drone_spectrograms_rc_24_fly12_session # drone_spectrograms_rc_24_58_fly16_session
+MODEL_PATH = ROOT / "runs_yolo11_cls" / "drone_spectrograms_rc24_58_fly24_session_c_unopes" / "weights" / "best.pt"  
 
 def iq_to_spec_image(iq_seg: np.ndarray) -> np.ndarray:
      f, t, Sxx = spectrogram(
