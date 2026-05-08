@@ -16,7 +16,7 @@ RF_BW_HZ = 45e6
 GAIN_DB = 45
 WINDOW_SAMPLES = 200_000
 
-# Bandas y secuencia de escaneo
+# Bands and scanning sequence
 CENTERS_24 = [2.427e9, 2.455e9]
 CENTERS_58 = [5.756e9, 5.787e9, 5.818e9]
 
@@ -31,7 +31,7 @@ SCAN_SEQUENCE = (
 )
 
 # Timing / retune
-RETUNE_SLEEP = 0.05      # segundos para que el LO estabilice
+RETUNE_SLEEP = 0.05      # seconds for the LO to stabilize
 LOOP_SLEEP = 0.02   
 
 def retune_and_flush(sdr, lo_hz: float):
@@ -46,13 +46,13 @@ CONFIRM_FRAMES  = 15
 NEIGHBOR_FRAMES = 10      
 
 
-# Umbrales
+# Thresholds
 SUSPECT_NONBG_CONF_THR = 0.25   
 SUSPECT_BG_CONF_LOW     = 0.55   
 SUSPECT_TOP2_THR        = 0.35 
 SUSPECT_MARGIN_THR      = 0.10
 
-# Confirmación
+# Confirmation
 CONFIRM_NONBG_CONF_THR = 0.50
 CONFIRM_MARGIN_THR     = 0.10
 
@@ -102,7 +102,7 @@ def collect_probs_mean_tuned(sdr, model, frames: int) -> tuple[np.ndarray | None
 
         iq_seg = np.asarray(iq[:WINDOW_SAMPLES], dtype=np.complex64)
         img_rgb = iq_to_spec_image(iq_seg)
-        img_bgr = img_rgb[:, :, ::-1]  # RGB -> BGR para OpenCV  
+        img_bgr = img_rgb[:, :, ::-1]  # RGB -> BGR for OpenCV  
         results = model.predict(source=img_bgr, imgsz=256, verbose=False)
         probs = results[0].probs.data.cpu().numpy()  # (nc,)
 
@@ -140,16 +140,16 @@ def summarize_probs(probs_mean: np.ndarray, class_names: dict) -> dict:
     }
 
 def is_suspect(s: dict) -> bool:
-    # Caso 1: top1 NO background con confianza moderada
+    # Case 1: top1 is NOT background with moderate confidence
     if s["label1"] != BACKGROUND_LABEL and s["conf1"] >= SUSPECT_NONBG_CONF_THR:
         return True
 
-    # Caso 2: top1 background pero está flojo y hay competencia fuerte
+    # Case 2: top1 is background, but weak, and there is strong competition
     if s["label1"] == BACKGROUND_LABEL:
         if s["conf1"] < SUSPECT_BG_CONF_LOW and (s["conf2"] >= SUSPECT_TOP2_THR or s["margin"] < SUSPECT_MARGIN_THR):
             return True
 
-    # Caso 3: margen muy pequeño (muy ambiguo) con conf decente
+    # Case 3: very small margin, highly ambiguous, with decent confidence
     if s["conf1"] > 0.35 and s["margin"] < SUSPECT_MARGIN_THR:
         return True
 
@@ -214,7 +214,7 @@ def main():
                     flush=True
                 )
 
-                # 2) sospecha -> confirmar en el mismo LO
+                # 2) suspect -> confirm on the same LO
                 if is_suspect(s_fast):
                     probs_c, n_ok_c = collect_probs_mean_tuned(sdr, model, CONFIRM_FRAMES)
                     if probs_c is None:
@@ -229,7 +229,7 @@ def main():
                         flush=True
                     )
 
-                    # 3) confirmado (revisa frecuencias vecinas para ver si hay algo similar)
+                    # 3) confirmed event, then checks neighboring frequencies for similar evidence
                     if is_confirmed(s_conf):
                         neigh = neighbor_indices(band, idx)
                         if neigh:
