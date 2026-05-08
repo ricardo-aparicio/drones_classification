@@ -3,28 +3,41 @@ from pathlib import Path
 import shutil
 
 ROOT = Path(".")
-INPUT_DIR = ROOT / "spectrograms_rc_24_58_fly21"
-OUTPUT_DIR = ROOT / "dataset_split_rc24_58_fly21_session"
+INPUT_DIR = ROOT / "spectrograms_rc_24_58_fly24_c_unopes"
+OUTPUT_DIR = ROOT / "dataset_split_rc24_58_fly24_session_c_unopes"
 
 MANUAL_SPLITS = {
     "autel": {
         # 2.4G and 5.8G session for Validation
-        "val":  ["autel_con_rc02_30db", "autel_envuelo_auto_5G_03","autel_envuelo_auto_06","autel_envuelo_auto_07","autel_envuelo_auto_5G_09","autel_envuelo_auto_5G_10"],
+        "val":  ["autel_con_rc02_30db", 
+                 "autel_envuelo_auto_5G_03",
+                 "autel_envuelo_auto_06",
+                 "autel_envuelo_auto_07",
+                 "autel_envuelo_auto_5G_09",
+                 "autel_envuelo_auto_5G_10",
+                ],
+
         # 2.4G and 5.8G session for Test
-        "test": ["autel_envuelo_auto_01", "autel_envuelo_auto_5G_01","autel_envuelo_auto_08","autel_envuelo_auto_09","autel_envuelo_auto_5G_11","autel_envuelo_auto_5G_12"]
+        "test": ["autel_envuelo_auto_01", 
+                 "autel_envuelo_auto_5G_01",
+                 "autel_envuelo_auto_08",
+                 "autel_envuelo_auto_09",
+                 "autel_envuelo_auto_5G_11",
+                 "autel_envuelo_auto_5G_12",
+                ]
     },                                     
     "m30t": {
         "val": [
         # --- 2.4G ---
-            "m30t_envuelo_10m_val",
-            "m30t_envuelo_10m_right_val",
-            "m30t_envuelo_10m_left_val",
+            "m30t_envuelo_10m_val_b",
+            "m30t_envuelo_10m_right_val_b",
+            "m30t_envuelo_10m_left_val_b",
 
-            "m30t_envuelo_20m_val",
+            "m30t_envuelo_20m_val_b",
             "m30t_envuelo_20m_right_val",
-            "m30t_envuelo_20m_left_val",
+            "m30t_envuelo_20m_left_val_b",
 
-            "m30t_envuelo_auto_val",
+            "m30t_envuelo_auto_val_b",
 
             "m30t_envuelo_40m_left_val",
             "m30t_envuelo_40m_right_val",
@@ -45,15 +58,15 @@ MANUAL_SPLITS = {
         ],
         "test": [
         # --- 2.4G ---
-            "m30t_envuelo_10m_test",
-            "m30t_envuelo_10m_right_test",
-            "m30t_envuelo_10m_left_test",
+            "m30t_envuelo_10m_test_b",
+            "m30t_envuelo_10m_right_test_b",
+            "m30t_envuelo_10m_left_test_b",
 
-            "m30t_envuelo_20m_test",
+            "m30t_envuelo_20m_test_b",
             "m30t_envuelo_20m_right_test",
-            "m30t_envuelo_20m_left_test",
+            "m30t_envuelo_20m_left_test_b",
 
-            "m30t_envuelo_auto_test",
+            "m30t_envuelo_auto_test_b",
 
             "m30t_envuelo_40m_left_test",
             "m30t_envuelo_40m_right_test",
@@ -132,14 +145,96 @@ MANUAL_SPLITS = {
             "mavic4pro_envuelo_40m_5G_center_test",
         ]
     },
+
+    "mavic3pro": {
+        "val": [
+        # --- 2.4G ---
+            "mavic3pro_envuelo_10m_center_val",
+            "mavic3pro_envuelo_10m_right_val",
+            "mavic3pro_envuelo_10m_left_val",
+
+            "mavic3pro_envuelo_20m_center_val",
+            "mavic3pro_envuelo_20m_right_val",
+            "mavic3pro_envuelo_20m_left_val",
+
+            # --- 5G ---
+            "mavic3pro_envuelo_10m_5G_left_val",
+            "mavic3pro_envuelo_10m_5G_right_val",
+            "mavic3pro_envuelo_10m_5G_center_val",
+
+            "mavic3pro_envuelo_20m_5G_left_val",
+            "mavic3pro_envuelo_20m_5G_right_val",
+            "mavic3pro_envuelo_20m_5G_center_val",
+        ],
+        "test": [
+        # --- 2.4G ---
+            "mavic3pro_envuelo_10m_center_test",
+            "mavic3pro_envuelo_10m_right_test",
+            "mavic3pro_envuelo_10m_left_test",
+
+            "mavic3pro_envuelo_20m_center_test",
+            "mavic3pro_envuelo_20m_right_test",
+            "mavic3pro_envuelo_20m_left_test",
+
+            # --- 5G ---
+            "mavic3pro_envuelo_10m_5G_left_test",
+            "mavic3pro_envuelo_10m_5G_right_test",
+            "mavic3pro_envuelo_10m_5G_center_test",
+
+            "mavic3pro_envuelo_20m_5G_left_test",
+            "mavic3pro_envuelo_20m_5G_right_test",
+            "mavic3pro_envuelo_20m_5G_center_test",
+        ]
+    },
+
     "fpv": {
-        "val":  ["dron_unopes_3"],
-        "test": ["dron_unopes_5"]
+        "val":  ["dron_unopes_3", "fpv_val",],
+        "test": ["dron_unopes_5", "fpv_test",],
     },
     "background": {
-        "val":  ["background_24G_real_02", "background_5G_real_02","background_24G_real_06","background_24G_real_08","background_5G_real_05","background_5G_real_08"],
-        "test": ["background_24G_real_03", "background_5G_real_03","background_24G_real_07","background_24G_real_09","background_5G_real_06","background_5G_real_09"]
+        "val":  ["background_24G_real_02", 
+                 "background_5G_real_02",
+                 "background_24G_real_06",
+                 "background_24G_real_08",
+                 "background_5G_real_05",
+                 "background_5G_real_08",
+                 "background_24G_real_12",
+                 "background_24G_real_12b",
+                 "background_24G_real_12c",
+                 "background_24G_real_15",
+                 "background_24G_real_15b",
+                 "background_24G_real_15c",
+                 "background_5G_real_12",
+                 "background_5G_real_12b",
+                 "background_5G_real_12c",
+                 "background_5G_real_14",
+                 "background_5G_real_14b",
+                 "background_5G_real_14c",
+                 "background_5G_real_17",
+                 "background_5G_real_17b",
+                 "background_5G_real_17c",
+                 "background_5G_5645_hardneg_val",
+                ],
+        "test": ["background_24G_real_03", 
+                 "background_5G_real_03",
+                 "background_24G_real_07",
+                 "background_24G_real_09",
+                 "background_5G_real_06",
+                 "background_5G_real_09",
+                 "background_24G_real_11",
+                 "background_24G_real_11a",
+                 "background_5G_real_11a",
+                 "background_24G_real_14",
+                 "background_24G_real_14a",
+                 "background_5G_real_11",
+                 "background_5G_real_15",
+                 "background_5G_real_15a",
+                 "background_5G_real_18",
+                 "background_5G_real_18a",
+                 "background_5G_5645_hardneg_test",
+                ]
     }
+
 }
 
 def main():
